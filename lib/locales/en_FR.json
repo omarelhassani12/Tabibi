@@ -1,0 +1,14 @@
+{
+"greeting": "Bienvenue",
+"button_label": "Démarrer",
+"connexion": "Connexion",
+"email": "Email",
+"enter_valid_email": "Entrez une adresse email valide",
+"password": "Mot de passe",
+"enter_password": "Le mot de passe doit comporter au moins 6 caractères",
+"login": "Se connecter",
+"forgot_password": "Mot de passe oublié ?",
+"no_account": "Vous n'avez pas de compte ?",
+"sign_up": "S'inscrire"
+}
+      
