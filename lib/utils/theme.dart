@@ -20,13 +20,15 @@ const Color languageSettings = Color(0xffCB256C);
 class ThemesApp {
   static final light = ThemeData(
     primaryColor: mainColor,
-    //backgroundColor: Colors.white,
+    // ignore: deprecated_member_use
+    backgroundColor: Colors.white,
     brightness: Brightness.light,
   );
 
   static final dark = ThemeData(
-    primaryColor: darkGreyClr,
-    //backgroundColor: darkGreyClr,
+    primaryColor: secondClr,
+    // ignore: deprecated_member_use
+    backgroundColor: Colors.black,
     brightness: Brightness.dark,
   );
 }

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.tabibi.app-mergeDebugResources-14:/values-sk/values-sk.xml",
+            "outputFile": "com.example.tabibi.app-mergeDebugResources-25:/values-sk/values-sk.xml",
             "map": [
                 {
                     "source": "C:\\Users\\dell\\.gradle\\caches\\transforms-3\\f5aeeb70e4aa208ac830e747eaf33ddc\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-sk\\values.xml",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\dell\\.gradle\\caches\\transforms-3\\7e9df2ac2213a6bd3cef0f2f27870d79\\transformed\\core-1.6.0\\res\\values-sk\\values-sk.xml",
+                    "source": "C:\\Users\\dell\\.gradle\\caches\\transforms-3\\c2aff38445ebad8ddeaa989ecf50f56e\\transformed\\core-1.9.0\\res\\values-sk\\values-sk.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

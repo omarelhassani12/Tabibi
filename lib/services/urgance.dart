@@ -9,7 +9,6 @@ Future<List<dynamic>> fetchUrgances() async {
     final data = json.decode(response.body);
     if (data['success']) {
       return data['urgances'];
-      print(data['urgance']);
     } else {
       throw Exception(data['message']);
     }

@@ -38,25 +38,16 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
 
     if (formData != null) {
       print(formData);
-      // Access the data from formData
-      // Example: String role = formData['role'];
-    } else {
-      // Handle the case when formData is null
-    }
+    } else {}
 
-    // To store the value of the first input
     formData!['nomPrenom'] = nomPrenomController.text;
 
-    // To store the value of the second input
     formData['email'] = emailController.text;
 
-    // To store the value of the third input
     formData['cni'] = cniController.text;
 
-    // To store the value of the fourth input
     formData['password'] = passwordController.text;
 
-    // To store the value of the fifth input
     formData['telephone'] = teleController.text;
 
     return SafeArea(
@@ -66,7 +57,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
           centerTitle: true,
           elevation: 0,
           title: Text(
-            'Inscrivez-vous',
+            'signUp'.tr,
             style: TextStyle(
               color: mainColor,
             ),
@@ -120,11 +111,10 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                           obscureText: false,
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Entrez un nom complete valide';
+                              return 'enterValidFullName'.tr;
                             } else if (!RegExp(r'^[a-zA-Z]+$')
                                 .hasMatch(value)) {
-                              // The input contains non-alphabet characters
-                              return 'Entrez des caractères alphabétiques seulement';
+                              return 'enterAlphabeticCharactersOnly'.tr;
                             } else {
                               return null;
                             }
@@ -135,7 +125,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                             size: 25,
                           ),
                           suffixIcon: const Text(""),
-                          hintText: 'nom et prenom',
+                          hintText: 'fullName'.tr,
                         ),
                       ),
                       const SizedBox(
@@ -148,7 +138,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                           obscureText: false,
                           validator: (value) {
                             if (!RegExp(validationEmail).hasMatch(value)) {
-                              return 'Entrez une adresse email valide';
+                              return 'enterValidEmail'.tr;
                             } else {
                               return null;
                             }
@@ -159,7 +149,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                             size: 25,
                           ),
                           suffixIcon: const Text(""),
-                          hintText: 'Email',
+                          hintText: 'emailHint'.tr,
                         ),
                       ),
                       const SizedBox(
@@ -172,11 +162,11 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                           obscureText: false,
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Entrez un numero de catre d\'identite valide valide';
+                              return 'enterValidCni'.tr;
                             } else if (!RegExp(r'^[a-zA-Z\d]+$')
                                 .hasMatch(value)) {
-                              // The input contains non-alphanumeric characters
-                              return 'Entrez des caractères alphabétiques et numériques seulement';
+                              return 'enterAlphabeticAndNumericCharactersOnly'
+                                  .tr;
                             } else {
                               return null;
                             }
@@ -187,7 +177,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                             size: 25,
                           ),
                           suffixIcon: const Text(""),
-                          hintText: 'Carte nationale d\'identité',
+                          hintText: 'nationalIdentityCard'.tr,
                         ),
                       ),
                       const SizedBox(
@@ -203,7 +193,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                                   controller.isVisibility ? false : true,
                               validator: (value) {
                                 if (value.toString().length < 6) {
-                                  return 'Le mot de passe doit comporter au moins 6 caractères';
+                                  return 'passwordMinLength'.tr;
                                 } else {
                                   return null;
                                 }
@@ -229,7 +219,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                                         size: 25,
                                       ),
                               ),
-                              hintText: 'Mot de passe',
+                              hintText: 'passwordHint'.tr,
                             );
                           },
                         ),
@@ -253,7 +243,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                           },
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return 'telephone is required';
+                              return 'telephoneRequired'.tr;
                             }
                             return null;
                           },
@@ -265,7 +255,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                               size: 25,
                               color: mainColor,
                             ),
-                            hintText: "Numéro de téléphone",
+                            hintText: "phoneNumber".tr,
                             hintStyle: const TextStyle(
                               color: Colors.black45,
                               fontSize: 16,
@@ -294,13 +284,13 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: const Text(
-                                    'Champs vides',
+                                  title: Text(
+                                    'emptyFields'.tr,
                                     textAlign: TextAlign.center,
                                   ),
                                   titleTextStyle:
                                       const TextStyle(color: Colors.red),
-                                  content: const Column(
+                                  content: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.min,
@@ -312,7 +302,7 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                                       ),
                                       SizedBox(height: 8),
                                       Text(
-                                        'Veuillez remplir tous les champs avant de continuer.',
+                                        'fillAllFields'.tr,
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
@@ -327,22 +317,21 @@ class _SignUpScreenDoctorState extends State<SignUpScreenDoctor> {
                               },
                             );
                           } else {
-                            // All inputs are filled, proceed with the desired action
                             Get.offNamed(
                               Routes.singUpDoctorPage,
                               arguments: formData,
                             );
                           }
                         },
-                        text: "Suivante",
+                        text: "next".tr,
                       ),
                     ],
                   ),
                 ),
               ),
               ContainerUnder(
-                text: "Vous avez déja un compte ?",
-                textType: "Se connecter",
+                text: "alreadyHaveAccount".tr,
+                textType: "signIn".tr,
                 onPressed: () {
                   Get.offNamed(Routes.loginScreen);
                 },

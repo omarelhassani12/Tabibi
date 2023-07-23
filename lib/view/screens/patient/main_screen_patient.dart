@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tabibi/languages/language_controller.dart';
 import 'package:tabibi/logic/controllers/auth_controller.dart';
 import 'package:tabibi/routes/routes.dart';
+import 'package:tabibi/services/message.dart';
 import 'package:tabibi/services/urgance.dart';
+import 'package:tabibi/services/users.dart';
 import 'package:tabibi/utils/theme.dart';
+import 'package:tabibi/view/detail_user.dart';
 import 'package:tabibi/view/screens/auth/login_screen.dart';
 import 'package:tabibi/view/screens/config/horizontalScroll.dart';
-import 'package:tabibi/view/screens/config/searchBar.dart';
+import 'package:tabibi/view/screens/patient/searchBar.dart';
 import 'package:tabibi/view/screens/config/topBar.dart';
-import 'package:tabibi/view/screens/patient/appointment_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tabibi/view/screens/profile.dart';
+import 'package:intl/intl.dart';
+// import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -33,10 +39,10 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 2;
 
   final pages = [
-    const favorites(),
+    Favorites(),
     const urgance(),
     const Home(),
-    const messages(),
+    const Messages(),
     const profile(),
   ];
 
@@ -182,23 +188,42 @@ class _HomeState extends State<Home> {
 
   getInfoUser() async {
     SharedPreferences cache = await SharedPreferences.getInstance();
-    String? cachedemail = cache.getString('email');
+    String? cachedEmail = cache.getString('email');
     String? cachedName = cache.getString('name');
 
     setState(() {
       name = cachedName;
-      email = cachedemail;
+      email = cachedEmail;
+    });
+  }
+
+  List<dynamic> doctors = [];
+  @override
+  void initState() {
+    super.initState();
+    Get.put(DoctorController());
+    getInfoUser();
+    fetchDoctors().then((fetchedDoctors) {
+      if (mounted) {
+        setState(() {
+          doctors = fetchedDoctors;
+        });
+      }
+    }).catchError((error) {
+      print('Error: $error');
     });
   }
 
   @override
-  void initState() {
-    super.initState();
-    getInfoUser();
+  void dispose() {
+    Get.delete<DoctorController>(); // Dispose of the controller
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // print(doctors);
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return SizedBox(
@@ -208,130 +233,151 @@ class _HomeState extends State<Home> {
             child: Container(
               color: Colors.white,
               child: Scaffold(
-                body: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      AppName(
-                        name: name,
-                        email: email,
+                body: Column(
+                  children: [
+                    AppName(
+                      name: name,
+                      email: email,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    SizedBox(
+                      width: 323,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'findYourDoctor'.tr,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.notifications,
+                            color: Colors.black,
+                          ),
+                        ],
                       ),
-                      ////
-                      const SizedBox(
-                        height: 5,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(
+                        left: 17,
+                        right: 17,
                       ),
-                      const SizedBox(
-                        width: 323,
-                        child: Row(
+                      child: SizedBox(
+                        height: 45,
+                        child: MyCustomSearchBar(),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: Text(
-                                'Trouvez votre médecin ici',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            SizedBox(
+                              width: 323,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'categories'.tr,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      'seeAll'.tr,
+                                      style: TextStyle(
+                                        color: mainColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Icon(
-                              Icons.notifications,
-                              color: Colors.black,
+                            const SizedBox(
+                              height: 170,
+                              child: HorizontalScroll(),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          left: 17,
-                          right: 17,
-                        ),
-                        child: SizedBox(
-                          height: 45,
-                          child: MyCustomSearchBar(),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 323,
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'Categories',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            SizedBox(
+                              width: 323,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'nearestSpecialist'.tr,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      'seeAll'.tr,
+                                      style: TextStyle(
+                                        color: mainColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                'Voir tout',
-                                style: TextStyle(
-                                  color: mainColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 170,
-                        child: HorizontalScroll(),
-                      ),
-                      SizedBox(
-                        width: 323,
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'Spécialiste le plus proche',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                'Voir tout',
-                                style: TextStyle(
-                                  color: mainColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: doctors.isEmpty ? 1 : doctors.length,
+                              itemBuilder: (context, index) {
+                                if (doctors.isEmpty) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  var doctor = doctors[index];
+                                  String doctorAvatar = doctor['avatar'] ?? '';
+                                  String doctorName = doctor['username'] ?? '';
+                                  String specialty = doctor['speciality'] ?? '';
+                                  int id = doctor['id'] ?? 0;
 
-                      SizedBox(
-                        child: DoctorCard(
-                          imagePath: 'assets/images/doctor.png',
-                          doctorName: 'Doctor',
-                          specialty: 'Cardiologist',
-                          onBookAppointmentPressed: () async {
-                            final result = await Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AppointmentForm(),
-                              ),
-                            );
-                            if (result != null) {}
-                          },
-                          onFavoritePressed: () {},
-                          onMessagePressed: () {
-                            Get.toNamed(Routes.messageScreen);
-                          },
+                                  return DoctorCard(
+                                    imagePath: doctorAvatar,
+                                    doctorName: doctorName,
+                                    specialty: specialty,
+                                    onViewDetailsPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              UserDetailsScreen(id: id),
+                                        ),
+                                      );
+                                    },
+                                    id: id,
+                                  );
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -342,28 +388,59 @@ class _HomeState extends State<Home> {
   }
 }
 
-//doctorCard
+class DoctorController extends GetxController {
+  RxList<int> likedIcons = <int>[].obs;
+  var favouritesList = <int>[].obs;
+
+  void toggleFavorite(int id) {
+    if (likedIcons.contains(id)) {
+      likedIcons.remove(id);
+    } else {
+      likedIcons.add(id);
+    }
+  }
+
+  void manageFavorites() {
+    if (likedIcons.isNotEmpty) {
+      final int id = likedIcons.first;
+      if (!favouritesList.contains(id)) {
+        favouritesList.add(id);
+      }
+    }
+  }
+
+  bool isFavorite(int id) {
+    return favouritesList.contains(id);
+  }
+
+  @override
+  void dispose() {
+    Get.delete<DoctorController>(); // Dispose of the controller
+    super.dispose();
+  }
+}
 
 class DoctorCard extends StatelessWidget {
+  final int id;
   final String imagePath;
   final String doctorName;
   final String specialty;
-  final VoidCallback onBookAppointmentPressed;
-  final VoidCallback onFavoritePressed;
-  final VoidCallback onMessagePressed;
+  final VoidCallback onViewDetailsPressed;
 
-  const DoctorCard({
-    super.key,
+  DoctorCard({
+    Key? key,
+    required this.id,
     required this.imagePath,
     required this.doctorName,
     required this.specialty,
-    required this.onBookAppointmentPressed,
-    required this.onFavoritePressed,
-    required this.onMessagePressed,
+    required this.onViewDetailsPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    final DoctorController controller =
+        Get.put(DoctorController()); // Register and retrieve DoctorController
+
     return Container(
       margin: const EdgeInsets.only(top: 14, left: 15, right: 15),
       padding: const EdgeInsets.all(5),
@@ -380,92 +457,93 @@ class DoctorCard extends StatelessWidget {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           InkWell(
-            onTap: onBookAppointmentPressed,
+            onTap: onViewDetailsPressed,
             child: ClipOval(
               child: SizedBox(
                 width: 100,
-                height: 70,
-                child: Image.asset(
+                height: 100,
+                child: Image.network(
                   imagePath,
-                  height: 70,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
           ),
-          const SizedBox(
-            width: 3,
-          ),
+          const SizedBox(width: 10),
           Expanded(
-            flex: 3,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                InkWell(
-                  onTap: onBookAppointmentPressed,
-                  child: Text(
-                    doctorName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                Column(
+                  children: [
+                    SizedBox(
+                      width: 100,
                     ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                InkWell(
-                  onTap: onBookAppointmentPressed,
-                  child: Text(
-                    specialty,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
+                    InkWell(
+                      onTap: onViewDetailsPressed,
+                      child: Text(
+                        doctorName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: onViewDetailsPressed,
+                      child: Text(
+                        specialty,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: onBookAppointmentPressed,
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(mainColor),
+                SizedBox(
+                  width: 250,
+                  child: ElevatedButton(
+                    onPressed: onViewDetailsPressed,
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(mainColor),
+                    ),
+                    child: Text('doctorDetails'.tr),
                   ),
-                  child: const Text('Réserver rendez-vous'),
                 ),
               ],
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    onPressed: onFavoritePressed,
-                    icon: Icon(
-                      Icons.favorite_border,
-                      size: 30,
-                      color: mainColor,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  IconButton(
-                    onPressed: onMessagePressed,
-                    icon: Transform.rotate(
-                      angle: 245 * 4 / 180,
-                      child: Icon(
-                        Icons.send,
-                        size: 30,
-                        color: mainColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Obx(() {
+                  final bool isLiked = controller.likedIcons.contains(id);
+                  return IconButton(
+                    onPressed: () => controller.toggleFavorite(id),
+                    icon: isLiked
+                        ? Icon(
+                            Icons.favorite_rounded,
+                            size: 30,
+                            color: mainColor,
+                          )
+                        : Icon(
+                            Icons.favorite_outline,
+                            size: 30,
+                            color: mainColor,
+                          ),
+                  );
+                }),
+                const SizedBox(height: 50),
+              ],
             ),
           ),
         ],
@@ -474,241 +552,44 @@ class DoctorCard extends StatelessWidget {
   }
 }
 
-//favorites
-class favorites extends StatelessWidget {
-  const favorites({Key? key}) : super(key: key);
+class Favorites extends StatelessWidget {
+  const Favorites({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final DoctorController controller = Get.put(DoctorController());
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favoris'),
+        title: Text('favorites'.tr),
         backgroundColor: mainColor,
         centerTitle: true,
         elevation: 1,
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: SafeArea(
-              child: Container(
-                color: Colors.white,
-                child: Scaffold(
-                  body: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        const SizedBox(
-                          width: 323,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                height: 50,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'Trouvez votre médecin préféré ici',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(
-                            left: 17,
-                            right: 17,
-                            bottom: 17,
-                          ),
-                          child: SizedBox(
-                            height: 45,
-                            child: MyCustomSearchBar(),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 323,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Favorite médecin',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          child: FavoritesMedecinCard(
-                            doctorName: 'Doctor',
-                            onPressed: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AppointmentForm(),
-                                ),
-                              );
-                              if (result != null) {}
-                            },
-                            imageAssetPath: 'assets/images/doctor.png',
-                            specialty: 'Spécialité ',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+      body: Obx(() {
+        final List<int> likedIcons = controller.likedIcons;
+        if (likedIcons.isEmpty) {
+          return Center(
+            child: Text('noFavorites'.tr),
           );
-        },
-      ),
-    );
-  }
-}
-
-///FavoritesMedecinCard
-
-class FavoritesMedecinCard extends StatelessWidget {
-  final String doctorName;
-  final String specialty;
-  final String imageAssetPath;
-  final VoidCallback onPressed;
-
-  const FavoritesMedecinCard({
-    Key? key,
-    required this.doctorName,
-    required this.specialty,
-    required this.imageAssetPath,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 14, left: 15, right: 15),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          InkWell(
-            onTap: onPressed,
-            child: ClipOval(
-              child: SizedBox(
-                width: 100,
-                height: 70,
-                child: Image.asset(
-                  imageAssetPath,
-                  height: 70,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 3,
-          ),
-          Expanded(
-            flex: 3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
-                  onTap: onPressed,
-                  child: Text(
-                    doctorName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                InkWell(
-                  onTap: onPressed,
-                  child: Text(
-                    specialty,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: onPressed,
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(mainColor),
-                  ),
-                  child: const Text('Réserver rendez-vous'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.favorite,
-                      size: 30,
-                      color: mainColor,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  IconButton(
-                    onPressed: onPressed,
-                    icon: Transform.rotate(
-                      angle: 245 * 4 / 180,
-                      child: Icon(
-                        Icons.send,
-                        size: 30,
-                        color: mainColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        } else {
+          return ListView.builder(
+            itemCount: likedIcons.length,
+            itemBuilder: (context, id) {
+              final int doctorid = likedIcons[id];
+              print(doctorid);
+              return DoctorCard(
+                id: doctorid,
+                imagePath:
+                    'https://res.cloudinary.com/dcmqib0q6/image/upload/v1685058545/user_vugshy.png',
+                doctorName: 'Doctor',
+                specialty: 'Specialty',
+                onViewDetailsPressed: () async {},
+              );
+            },
+          );
+        }
+      }),
     );
   }
 }
@@ -749,7 +630,7 @@ class _urganceState extends State<urgance> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Types d\'urgences'),
+        title: Text('emergencyTypes'.tr),
         backgroundColor: mainColor,
         centerTitle: true,
         elevation: 1,
@@ -759,7 +640,7 @@ class _urganceState extends State<urgance> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 323,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -769,7 +650,7 @@ class _urganceState extends State<urgance> {
                   ),
                   Expanded(
                     child: Text(
-                      'Trouvez votre cas d\'urgence ici',
+                      'findEmergencyCase'.tr,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.black,
@@ -793,13 +674,13 @@ class _urganceState extends State<urgance> {
                 child: MyCustomSearchBar(),
               ),
             ),
-            const SizedBox(
+            SizedBox(
               width: 323,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Types d\'urgence',
+                    'emergencyTypes'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -814,13 +695,9 @@ class _urganceState extends State<urgance> {
             ),
             const SizedBox(height: 16.0),
             isLoading
-                ? const Center(
-                    child:
-                        CircularProgressIndicator()) // Display circular loading indicator while data is being fetched
+                ? const Center(child: CircularProgressIndicator())
                 : urgances.isEmpty
-                    ? const Center(
-                        child: Text(
-                            'No data available')) // Display a message if no data is fetched
+                    ? Center(child: Text('noDataAvailable'.tr))
                     : ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -894,12 +771,14 @@ class _EmergencyCard extends StatelessWidget {
 
 //messages
 class Conversation {
+  final int id;
   final String name;
   final String message;
   final String time;
   final String avatarUrl;
 
   Conversation({
+    required this.id,
     required this.name,
     required this.message,
     required this.time,
@@ -908,72 +787,178 @@ class Conversation {
 }
 
 class Message {
+  final int id;
   final String sender;
+  final String senderName; // Add the sender's name property
+  final String receiver;
   final String message;
   final String time;
-  final bool isLiked;
-  final bool unread;
 
   Message({
+    required this.id,
     required this.sender,
+    required this.senderName,
+    required this.receiver,
     required this.message,
     required this.time,
-    required this.isLiked,
-    required this.unread,
   });
+
+  String get formattedTime {
+    final dateTime = DateFormat('yyyy-MM-dd HH:mm:ss').parse(time);
+    final formatter = DateFormat('yy/MM/dd HH:mm');
+    return formatter.format(dateTime);
+  }
 }
 
-class messages extends StatefulWidget {
-  const messages({super.key});
+class Messages extends StatefulWidget {
+  const Messages({Key? key}) : super(key: key);
 
   @override
-  _messagesState createState() => _messagesState();
+  _MessagesState createState() => _MessagesState();
 }
 
-class _messagesState extends State<messages> {
-  final List<Conversation> _conversations = [
-    Conversation(
-      name: 'Alice',
-      message: 'Hello, how are you?',
-      time: '12:30 PM',
-      // avatarUrl: 'assets/images/doctor.png',
-      avatarUrl: 'assets/images/doctor.png',
-    ),
-  ];
+class _MessagesState extends State<Messages> {
+  List<dynamic> doctors = [];
+  List<Conversation> _conversations = [];
+  int currentUserID = 0;
+
+  //socket
+  // IO.Socket? socket;
+
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        currentUserID = prefs.getInt('id') ?? 0;
+      });
+    });
+    fetchDoctors().then((fetchedDoctors) {
+      if (mounted) {
+        setState(() {
+          doctors = fetchedDoctors;
+        });
+        fetchLastMessages().then((lastMessages) {
+          if (mounted) {
+            setState(() {
+              _conversations = generateConversations(lastMessages);
+            });
+          }
+        }).catchError((error) {
+          print('Error fetching last messages: $error');
+          if (mounted) {
+            setState(() {
+              _conversations = [];
+            });
+          }
+        });
+      }
+    }).catchError((error) {
+      print('Error fetching patients: $error');
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> fetchLastMessages() async {
+    final List<Future<Map<String, dynamic>>> futures = [];
+    for (var doctor in doctors) {
+      if (doctor['id'] != null) {
+        futures.add(fetchLastMessage(
+            currentUserID.toString(), doctor['id'].toString()));
+      }
+    }
+    return await Future.wait(futures);
+  }
+
+  List<Conversation> generateConversations(
+      List<Map<String, dynamic>> lastMessages) {
+    List<Conversation> conversations = [];
+    for (var i = 0; i < doctors.length; i++) {
+      final patient = doctors[i];
+      final lastMessage = lastMessages[i];
+      final message = lastMessage['message'] != null
+          ? lastMessage['message']
+          : 'noMessage'.tr;
+      final time = lastMessage['created_at'] != null
+          ? formatDateTime(lastMessage['created_at'])
+          : '';
+
+      conversations.add(
+        Conversation(
+          id: patient['id'],
+          name: patient['username'],
+          message: message,
+          time: time,
+          avatarUrl: patient['avatar'],
+        ),
+      );
+    }
+    return conversations;
+  }
+
+  String formatDateTime(String timestamp) {
+    final DateTime dateTime = DateTime.parse(timestamp);
+    final DateFormat formatter = DateFormat.yMd().add_jm();
+    return formatter.format(dateTime);
+  }
+
+  // initTheSoket() {
+  //   socket = IO.io("http://192.168.1.26:3000/", {
+  //     'transports': ['websocket'],
+  //     'autoConnect': false
+  //   });
+
+  //   socket!.connect();
+  //   socket!.onConnect((_) {
+  //     print("Connected with the server");
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mainColor,
-        elevation: 1,
-        title: const Text('Messages'),
+        elevation: 0,
+        title: Text('messages'.tr),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: _conversations.length,
-        itemBuilder: (context, index) {
-          final conversation = _conversations[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: AssetImage(conversation.avatarUrl),
-            ),
-            title: Text(conversation.name),
-            subtitle: Text(conversation.message),
-            trailing: Text(conversation.time),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConversationScreen(
-                    conversation: conversation,
+      body: _conversations.isEmpty
+          ? Center(
+              child: Text(
+                'noMessage'.tr,
+                style: TextStyle(fontSize: 16),
+              ),
+            )
+          : ListView.builder(
+              itemCount: _conversations.length,
+              itemBuilder: (context, index) {
+                final conversation = _conversations[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(conversation.avatarUrl),
                   ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+                  title: Text(conversation.name),
+                  subtitle: Text(
+                    conversation.message.length > 20
+                        ? '${conversation.message.substring(0, 30)}...'
+                        : conversation.message,
+                  ),
+                  trailing: Text(
+                    conversation.time,
+                    style: TextStyle(fontSize: 11),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ConversationScreen(
+                          conversation: conversation,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
     );
   }
 }
@@ -981,32 +966,55 @@ class _messagesState extends State<messages> {
 class ConversationScreen extends StatefulWidget {
   final Conversation conversation;
 
-  const ConversationScreen({super.key, required this.conversation});
+  const ConversationScreen({
+    Key? key,
+    required this.conversation,
+  }) : super(key: key);
 
   @override
   _ConversationScreenState createState() => _ConversationScreenState();
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-  final List<Message> _messages = [
-    Message(
-      sender: 'Alice',
-      message: 'Hello, how are you?',
-      time: '10:30 AM',
-      isLiked: false,
-      unread: true,
-    ),
-    Message(
-      sender: 'dddd',
-      message: 'Hello, how are you?',
-      time: '10:30 AM',
-      isLiked: false,
-      unread: true,
-    ),
-  ];
+  List<Message> _messages = [];
+  int currentUserID = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        currentUserID = prefs.getInt('id') ?? 0;
+      });
+      fetchMessages(currentUserID, widget.conversation.id)
+          .then((fetchedMessages) {
+        if (mounted) {
+          setState(() {
+            _messages = fetchedMessages
+                .map((message) => Message(
+                      id: message.id,
+                      sender: message.sender,
+                      senderName: message.senderName,
+                      receiver: message.receiver,
+                      message: message.message,
+                      time: message.time,
+                    ))
+                .toList();
+          });
+        }
+      }).catchError((error, stackTrace) {
+        print('Error fetching messages: $error');
+        print('Stack trace: $stackTrace');
+        print('Conversation ID: ${widget.conversation.id}');
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    int conversationId = widget.conversation.id;
+    print("the sender: $currentUserID");
+    print("the receiver: $conversationId");
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -1035,26 +1043,38 @@ class _ConversationScreenState extends State<ConversationScreen> {
               itemCount: _messages.length,
               itemBuilder: (BuildContext context, int index) {
                 final message = _messages[index];
-                return MessageBubble(
-                  message: message,
-                  isMe: message.sender == 'Alice' ? false : true,
+                final bool isMe = message.sender == currentUserID.toString();
+                return Align(
+                  alignment:
+                      isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  child: MessageBubble(
+                    message: message,
+                    isMe: isMe,
+                    conversationName: widget.conversation.name,
+                  ),
                 );
               },
             ),
           ),
           MessageInput(
-            onSendMessage: (String message) {
+            onMessageSent: (String message) {
+              final currentTime = DateTime.now();
               Message newMessage = Message(
-                sender: 'Me',
+                id: _messages.length + 1,
+                sender: currentUserID.toString(),
                 message: message,
-                time: '${DateTime.now().hour}:${DateTime.now().minute}',
-                isLiked: false,
-                unread: true,
+                receiver: conversationId.toString(),
+                time: currentTime.toString(),
+                senderName: '',
               );
               setState(() {
                 _messages.add(newMessage);
               });
             },
+            currentUserID:
+                currentUserID.toString(), // Pass the currentUserID as a String
+            conversation: widget.conversation,
+            onSendMessage: (String message) {},
           ),
         ],
       ),
@@ -1065,8 +1085,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
 class MessageBubble extends StatelessWidget {
   final Message message;
   final bool isMe;
+  final String conversationName;
 
-  const MessageBubble({super.key, required this.message, required this.isMe});
+  const MessageBubble({
+    Key? key,
+    required this.message,
+    required this.isMe,
+    required this.conversationName,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1076,23 +1102,23 @@ class MessageBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: isMe ? Colors.grey[200] : mainColor,
         borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(30.0),
-          topRight: const Radius.circular(30.0),
-          bottomLeft:
+          topLeft:
               isMe ? const Radius.circular(30.0) : const Radius.circular(0),
-          bottomRight:
+          topRight:
               isMe ? const Radius.circular(0) : const Radius.circular(30.0),
+          bottomLeft: const Radius.circular(30.0),
+          bottomRight: const Radius.circular(30.0),
         ),
       ),
       child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            message.sender,
-            style: TextStyle(
-              color: Colors.grey[800],
-              fontSize: 12.0,
+            isMe ? 'Me' : conversationName,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 0, 0, 0),
+              fontSize: 14.0,
+              fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 5.0),
@@ -1100,14 +1126,14 @@ class MessageBubble extends StatelessWidget {
             message.message,
             style: TextStyle(
               color: isMe ? Colors.black : Colors.white,
-              fontSize: 15.0,
+              fontSize: 16.0,
             ),
           ),
           const SizedBox(height: 5.0),
           Text(
-            message.time,
-            style: TextStyle(
-              color: Colors.grey[800],
+            DateFormat('yy/MM/dd HH:mm').format(DateTime.parse(message.time)),
+            style: const TextStyle(
+              color: Color.fromARGB(255, 117, 117, 117),
               fontSize: 12.0,
             ),
           ),
@@ -1118,9 +1144,15 @@ class MessageBubble extends StatelessWidget {
 }
 
 class MessageInput extends StatefulWidget {
-  final Function(String) onSendMessage;
+  final String currentUserID;
+  final Conversation conversation;
+  final Function(String) onMessageSent; // Callback function
 
-  const MessageInput({super.key, required this.onSendMessage});
+  MessageInput(
+      {required this.currentUserID,
+      required this.conversation,
+      required this.onMessageSent,
+      required Null Function(String message) onSendMessage});
 
   @override
   _MessageInputState createState() => _MessageInputState();
@@ -1131,8 +1163,23 @@ class _MessageInputState extends State<MessageInput> {
 
   void _sendMessage() {
     if (_textEditingController.text.isNotEmpty) {
-      widget.onSendMessage(_textEditingController.text);
+      final senderId = widget.currentUserID.toString();
+      final receiverId = widget.conversation.id.toString();
+      final message = _textEditingController.text;
+
+      _handleSendMessage(senderId, receiverId, message);
       _textEditingController.clear();
+    }
+  }
+
+  Future<void> _handleSendMessage(
+      String senderId, String receiverId, String message) async {
+    try {
+      await sendMessage(senderId, receiverId, message);
+      print('Message sent successfully');
+      widget.onMessageSent(message);
+    } catch (error) {
+      print('Failed to send the message. Error: $error');
     }
   }
 
@@ -1151,7 +1198,8 @@ class _MessageInputState extends State<MessageInput> {
             child: TextField(
               controller: _textEditingController,
               decoration: const InputDecoration.collapsed(
-                  hintText: 'Entrez un message...'),
+                hintText: 'Enter a message...',
+              ),
               onSubmitted: (value) {
                 _sendMessage();
               },
@@ -1180,14 +1228,17 @@ class _profileState extends State<profile> {
   final AuthController _authController = AuthController();
 
   String? name;
+  String? avatar;
 
   getInfoUser() async {
     SharedPreferences cache = await SharedPreferences.getInstance();
     // String? cachedemail = cache.getString('email');
     String? cachedName = cache.getString('name');
+    String? cachedAvatar = cache.getString('avatar');
 
     setState(() {
       name = cachedName;
+      avatar = cachedAvatar;
       // email = cachedemail;
     });
   }
@@ -1197,7 +1248,6 @@ class _profileState extends State<profile> {
     super.initState();
     getInfoUser();
 
-    super.initState();
     Get.put(_authController);
   }
 
@@ -1231,11 +1281,12 @@ class _profileState extends State<profile> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Icon(
-                          Icons.person,
-                          size: 100,
-                          color: Colors.black,
-                        ),
+                        if (avatar?.isNotEmpty ?? false)
+                          Image.network(
+                            avatar!,
+                            width: 100,
+                            height: 100,
+                          ),
                         const SizedBox(height: 20),
                         Text(
                           '$name',
@@ -1258,6 +1309,9 @@ class _profileState extends State<profile> {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              const SizedBox(
+                height: 160,
+              ),
               Container(
                 width: 300,
                 height: 400,
@@ -1271,7 +1325,8 @@ class _profileState extends State<profile> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const Home()),
+                          MaterialPageRoute(
+                              builder: (context) => ProfileScreen()),
                         );
                       },
                       child: Container(
@@ -1285,17 +1340,115 @@ class _profileState extends State<profile> {
                           bottom: 10.0,
                           top: 10,
                         ),
-                        child: const ListTile(
+                        child: ListTile(
                           leading: Icon(
                             Icons.person,
                             color: Colors.black,
                           ),
                           title: Text(
-                            'profil ',
+                            'profile'.tr,
                             style: TextStyle(
                               color: Colors.black,
                             ),
                           ),
+                        ),
+                      ),
+                    ),
+                    GetBuilder<LanguageController>(
+                      init: LanguageController(),
+                      builder: (value) {
+                        return Container(
+                          height: 80,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom:
+                                  BorderSide(color: Colors.black, width: 0.25),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.language,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(width: 35),
+                                  Text(
+                                    'language'.tr,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              DropdownButton<String>(
+                                value: value.savedLang.value,
+                                icon: Icon(
+                                  Icons.arrow_downward,
+                                  size: 20,
+                                ),
+                                onChanged: (String? newValue) {
+                                  print('Selected language: $newValue');
+                                  if (newValue != null) {
+                                    value.savedLang.value = newValue;
+                                    Get.updateLocale(
+                                        Locale(newValue.toLowerCase()));
+                                    value.saveLocale();
+                                  }
+                                },
+                                items: <DropdownMenuItem<String>>[
+                                  DropdownMenuItem<String>(
+                                    value: 'ar',
+                                    child: Text('العربية'),
+                                  ),
+                                  DropdownMenuItem<String>(
+                                    value: 'fr',
+                                    child: Text('Français'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom:
+                                BorderSide(color: Colors.black, width: 0.25),
+                          ),
+                        ),
+                        padding: const EdgeInsets.only(
+                          bottom: 10,
+                          top: 10,
+                        ),
+                        child: Column(
+                          children: [
+                            SwitchListTile(
+                              title: Text(
+                                'darkMode'.tr,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              secondary: Icon(
+                                Icons.dark_mode,
+                                color: Colors.black,
+                              ),
+                              value: true,
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -1317,77 +1470,13 @@ class _profileState extends State<profile> {
                           bottom: 10,
                           top: 10,
                         ),
-                        child: const ListTile(
-                          leading: Icon(
-                            Icons.people_alt,
-                            color: Colors.black,
-                          ),
-                          title: Text(
-                            'Mes médecins préférés',
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const Home()),
-                        );
-                      },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom:
-                                BorderSide(color: Colors.black, width: 0.25),
-                          ),
-                        ),
-                        padding: const EdgeInsets.only(
-                          bottom: 10,
-                          top: 10,
-                        ),
-                        child: const ListTile(
-                          leading: Icon(
-                            Icons.settings,
-                            color: Colors.black,
-                          ),
-                          title: Text(
-                            'Paramètres',
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const Home()),
-                        );
-                      },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom:
-                                BorderSide(color: Colors.black, width: 0.25),
-                          ),
-                        ),
-                        padding: const EdgeInsets.only(
-                          bottom: 10,
-                          top: 10,
-                        ),
-                        child: const ListTile(
+                        child: ListTile(
                           leading: Icon(
                             Icons.help,
                             color: Colors.black,
                           ),
                           title: Text(
-                            'Assistance',
+                            'assistance'.tr,
                             style: TextStyle(
                               color: Colors.black,
                             ),
@@ -1397,13 +1486,57 @@ class _profileState extends State<profile> {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        SharedPreferences cache =
-                            await SharedPreferences.getInstance();
-                        await cache.clear();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.dangerous,
+                                    color: Colors.red,
+                                    size: 50,
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'confirmationLogoutTitle'.tr,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                              content: Text(
+                                'confirmationLogoutMessage'.tr,
+                                textAlign: TextAlign.center,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('cancel'.tr,
+                                      style: TextStyle(color: Colors.blueGrey)),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    SharedPreferences cache =
+                                        await SharedPreferences.getInstance();
+                                    await cache.clear();
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginScreen()),
+                                      (Route<dynamic> route) => false,
+                                    );
+                                  },
+                                  child: Text(
+                                    'logout'.tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
                       child: Container(
@@ -1417,13 +1550,13 @@ class _profileState extends State<profile> {
                           bottom: 10,
                           top: 10,
                         ),
-                        child: const ListTile(
+                        child: ListTile(
                           leading: Icon(
                             Icons.logout,
                             color: Colors.black,
                           ),
                           title: Text(
-                            'Se déconnecter',
+                            'logout'.tr,
                             style: TextStyle(
                               color: Colors.black,
                             ),

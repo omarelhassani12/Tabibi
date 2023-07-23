@@ -57,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 height: 35,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  'Inscrivez-vous',
+                                  'signUp'.tr,
                                   style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
@@ -73,8 +73,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         Column(
                           children: [
-                            const Text(
-                              'Veuillez choisir la nature du service :',
+                            Text(
+                              'chooseServiceNature'.tr,
                               style: TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 15),
@@ -86,7 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     color: Colors.grey.shade200,
                                   ),
                                   child: DropdownButtonFormField<String>(
-                                    hint: const Text('Sélectionner un service'),
+                                    hint: Text('selectService'.tr),
                                     decoration: const InputDecoration(
                                       contentPadding: EdgeInsets.symmetric(
                                           horizontal: 16, vertical: 0),
@@ -100,8 +100,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       });
                                     },
                                     items: <String>[
-                                      'Patient',
-                                      'Doctor',
+                                      'patient',
+                                      'doctor',
                                     ].map<DropdownMenuItem<String>>(
                                         (String value) {
                                       return DropdownMenuItem<String>(
@@ -138,15 +138,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title:
-                                        const Text('Service non sélectionné'),
-                                    content: const Text(
-                                      'Veuillez sélectionner un service avant de continuer.',
+                                    title: Text('serviceNotSelected'.tr),
+                                    content: Text(
+                                      'selectServiceBeforeContinuing'.tr,
                                     ),
                                     actions: <Widget>[
                                       TextButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: const Text('OK'),
+                                        child: Text('OK'.tr),
                                       ),
                                     ],
                                   );
@@ -155,13 +154,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             } else {
                               // Check if formData is not null
                               if (formData.isNotEmpty) {
-                                if (dropdownValue == 'Patient') {
+                                if (dropdownValue == 'patient') {
                                   Navigator.pushNamed(
                                     context,
                                     Routes.signUpScreenPatient,
                                     arguments: formData,
                                   );
-                                } else if (dropdownValue == 'Doctor') {
+                                } else if (dropdownValue == 'doctor') {
                                   Navigator.pushNamed(
                                     context,
                                     Routes.signUpScreenDoctor,
@@ -174,7 +173,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               }
                             }
                           },
-                          text: 'Suivante',
+                          text: 'next'.tr,
                         ),
                       ],
                     ),
@@ -185,8 +184,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 height: 20,
               ),
               ContainerUnder(
-                text: "Vous avez déja un compte ?",
-                textType: "Se connecter",
+                text: "alreadyHaveAccount".tr,
+                textType: "login".tr,
                 onPressed: () {
                   Get.offNamed(Routes.loginScreen);
                 },

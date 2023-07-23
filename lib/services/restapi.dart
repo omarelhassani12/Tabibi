@@ -16,15 +16,17 @@ Future<Map<String, dynamic>> userLogin(String email, String password) async {
 }
 
 Future<Map<String, dynamic>> userRegister(
-    String type,
-    String nomPrenom,
-    String email,
-    String cni,
-    String password,
-    String telephone,
-    String urgence,
-    String sexe,
-    String age) async {
+  String? type,
+  String? nomPrenom,
+  String? email,
+  String? cni,
+  String? password,
+  String? telephone,
+  String? urgence,
+  String? specialty,
+  String? sexe,
+  String? age,
+) async {
   final response = await http.post(
     Uri.parse('${Utils.baseUrl}/user/register'),
     headers: {"Content-Type": "application/json;charset=UTF-8"},
@@ -36,6 +38,7 @@ Future<Map<String, dynamic>> userRegister(
       'password': password,
       'telephone': telephone,
       'urgence': urgence,
+      'specialty': specialty,
       'sexe': sexe,
       'age': age,
     }),

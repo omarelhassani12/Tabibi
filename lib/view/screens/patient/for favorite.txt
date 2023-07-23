@@ -1,0 +1,399 @@
+
+class _HomeState extends State<Home> {
+  String? name;
+  String? email;
+
+  getInfoUser() async {
+    SharedPreferences cache = await SharedPreferences.getInstance();
+    String? cachedEmail = cache.getString('email');
+    String? cachedName = cache.getString('name');
+
+    setState(() {
+      name = cachedName;
+      email = cachedEmail;
+    });
+  }
+
+  List<dynamic> doctors = [];
+  @override
+  void initState() {
+    super.initState();
+    getInfoUser();
+    fetchDoctors().then((fetchedDoctors) {
+      if (mounted) {
+        setState(() {
+          doctors = fetchedDoctors;
+        });
+      }
+    }).catchError((error) {
+      // Handle error when fetching doctors
+      print('Error: $error');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // print(doctors);
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: SafeArea(
+            child: Container(
+              color: Colors.white,
+              child: Scaffold(
+                body: Column(
+                  children: [
+                    AppName(
+                      name: name,
+                      email: email,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    const SizedBox(
+                      width: 323,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Trouvez votre médecin ici',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.notifications,
+                            color: Colors.black,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(
+                        left: 17,
+                        right: 17,
+                      ),
+                      child: SizedBox(
+                        height: 45,
+                        child: MyCustomSearchBar(),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: 323,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Categories',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      'Voir tout',
+                                      style: TextStyle(
+                                        color: mainColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 170,
+                              child: HorizontalScroll(),
+                            ),
+                            SizedBox(
+                              width: 323,
+                              child: Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text(
+                                      'Spécialiste le plus proche',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      'Voir tout',
+                                      style: TextStyle(
+                                        color: mainColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: doctors.isEmpty ? 1 : doctors.length,
+                              itemBuilder: (context, index) {
+                                if (doctors.isEmpty) {
+                                  // Display a CircularProgressIndicator while fetching doctors
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  var doctor = doctors[index];
+                                  String doctorName = doctor['username'] ?? '';
+                                  String specialty = doctor['speciality'] ?? '';
+                                  int id = doctor['id'] ?? 0;
+
+                                  return DoctorCard(
+                                    imagePath: 'assets/images/doctor.png',
+                                    doctorName: doctorName,
+                                    specialty: specialty,
+                                    onBookAppointmentPressed: () async {},
+                                    onMessagePressed: () {
+                                      Get.toNamed(Routes.messageScreen);
+                                    },
+                                    id: id,
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DoctorController extends GetxController {
+  RxList<int> likedIcons = <int>[].obs;
+  var favouritesList = <int>[].obs;
+
+  void toggleFavorite(int id) {
+    if (likedIcons.contains(id)) {
+      likedIcons.remove(id);
+    } else {
+      likedIcons.add(id);
+    }
+  }
+
+  void manageFavorites() {
+    if (likedIcons.isNotEmpty) {
+      final int id = likedIcons.first;
+      if (!favouritesList.contains(id)) {
+        favouritesList.add(id);
+      }
+    }
+  }
+
+  bool isFavorite(int id) {
+    return favouritesList.contains(id);
+  }
+}
+
+class DoctorCard extends StatelessWidget {
+  final int id;
+  final String imagePath;
+  final String doctorName;
+  final String specialty;
+  final VoidCallback onBookAppointmentPressed;
+  final VoidCallback onMessagePressed;
+
+  DoctorCard({
+    Key? key,
+    required this.id,
+    required this.imagePath,
+    required this.doctorName,
+    required this.specialty,
+    required this.onBookAppointmentPressed,
+    required this.onMessagePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final DoctorController controller =
+        Get.put(DoctorController()); // Register and retrieve DoctorController
+
+    return Container(
+      margin: const EdgeInsets.only(top: 14, left: 15, right: 15),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          InkWell(
+            onTap: onBookAppointmentPressed,
+            child: ClipOval(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: onBookAppointmentPressed,
+                  child: Text(
+                    doctorName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: onBookAppointmentPressed,
+                  child: Text(
+                    specialty,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: onBookAppointmentPressed,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(mainColor),
+                  ),
+                  child: const Text('Doctor Details'),
+                ),
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Obx(() {
+                  final bool isLiked = controller.likedIcons.contains(id);
+                  return IconButton(
+                    onPressed: () => controller.toggleFavorite(id),
+                    icon: isLiked
+                        ? Icon(
+                            Icons.favorite_rounded,
+                            size: 30,
+                            color: mainColor,
+                          )
+                        : Icon(
+                            Icons.favorite_outline,
+                            size: 30,
+                            color: mainColor,
+                          ),
+                  );
+                }),
+                const SizedBox(height: 20),
+                IconButton(
+                  onPressed: onMessagePressed,
+                  icon: Transform.rotate(
+                    angle: 245 * 4 / 180,
+                    child: Icon(
+                      Icons.send,
+                      size: 30,
+                      color: mainColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Favorites extends StatelessWidget {
+  const Favorites({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final DoctorController controller = Get.find<DoctorController>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Favorites'),
+        backgroundColor: mainColor,
+        centerTitle: true,
+        elevation: 1,
+      ),
+      body: Obx(() {
+        final List<int> likedIcons = controller.likedIcons;
+        if (likedIcons.isEmpty) {
+          return Center(
+            child: Text('No favorites yet.'),
+          );
+        } else {
+          return ListView.builder(
+            itemCount: likedIcons.length,
+            itemBuilder: (context, id) {
+              final int doctorid = likedIcons[id];
+
+              return DoctorCard(
+                id: doctorid,
+                imagePath: 'assets/images/doctor.png',
+                doctorName: 'Doctor',
+                specialty: 'Specialty',
+                onBookAppointmentPressed: () async {},
+                onMessagePressed: () {
+                  Get.toNamed(Routes.messageScreen);
+                },
+              );
+            },
+          );
+        }
+      }),
+    );
+  }
+}

@@ -128,13 +128,6 @@ class _AddUrgencyPage extends State<AddUrgencyPage> {
               const SizedBox(
                 height: 20,
               ),
-              /* ContainerUnder(
-    text: "Vous avez déja un compte ?",
-    textType: "Se connecter",
-    onPressed: () {
-    Get.offNamed(Routes.loginScreen);
-    },
-    ),*/
             ],
           ),
         ),

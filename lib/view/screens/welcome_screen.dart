@@ -40,13 +40,13 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(
                   height: 320,
                 ),
-                 const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextUtils(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
-                      text: "Bienvenue",
+                      text: 'welcome'.tr,
                       color: Colors.lightBlueAccent,
                       underLine: TextDecoration.none,
                     ),
@@ -70,11 +70,11 @@ class WelcomeScreen extends StatelessWidget {
                   onPressed: () {
                     Get.offNamed(Routes.loginScreen);
                   },
-                  child: const TextUtils(
+                  child:  TextUtils(
                     fontSize: 22,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    text: "Commencer",
+                    text: "start".tr,
                     underLine: TextDecoration.none,
                   ),
                 ),

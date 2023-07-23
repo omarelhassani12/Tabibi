@@ -31,6 +31,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
       formData['password'],
       formData['telephone'],
       formData['urgence'],
+      formData['specialty'],
       formData['sexe'],
       formData['age'],
     );
@@ -42,9 +43,9 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
       String errorMsg = '';
       if (res['message'] ==
           'The email you entered is already in use. Please try with a different email address.') {
-        errorMsg = 'This email is already registered.';
+        errorMsg = 'emailAlreadyRegistered'.tr;
       } else {
-        errorMsg = 'An error occurred. Please try by another email.';
+        errorMsg = 'errorOccurred'.tr;
       }
 
       Fluttertoast.showToast(
@@ -54,7 +55,6 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
     }
   }
 
-  // default value
   @override
   Widget build(BuildContext context) {
     final formData =
@@ -103,8 +103,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                                     color: Colors.grey.shade200,
                                   ),
                                   child: DropdownButtonFormField<String>(
-                                    hint:
-                                        const Text('Sélectionner une urgence'),
+                                    hint: Text('selectUrgence'.tr),
                                     decoration: const InputDecoration(
                                       contentPadding: EdgeInsets.symmetric(
                                         horizontal: 16,
@@ -117,7 +116,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                                     onChanged: (String? newValue) {
                                       setState(() {
                                         dropdownValue = newValue!;
-                                        formData['urgence'] = dropdownValue;
+                                        formData['specialty'] = dropdownValue;
                                       });
                                       if (dropdownValue == 'Autre') {
                                         Navigator.pushNamed(
@@ -164,7 +163,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                                     color: Colors.grey.shade200,
                                   ),
                                   child: DropdownButtonFormField<String>(
-                                    hint: const Text('Sélectionner le sexe'),
+                                    hint: Text('selectSexe'.tr),
                                     decoration: const InputDecoration(
                                       contentPadding: EdgeInsets.symmetric(
                                           horizontal: 16, vertical: 0),
@@ -215,7 +214,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                           child: TextFormField(
                             controller: controller,
                             decoration: InputDecoration(
-                              labelText: "age",
+                              labelText: 'age'.tr,
                               filled: true,
                               fillColor: Colors.grey.shade200,
                               border: const UnderlineInputBorder(
@@ -231,7 +230,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                             ],
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return 'age is required';
+                                return 'ageIsRequired'.tr;
                               }
                               return null;
                             },
@@ -249,7 +248,7 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                           onPressed: () async {
                             await doRegister(Get.arguments);
                           },
-                          text: 'S\'incrire',
+                          text: 'register'.tr,
                         ),
                       ],
                     ),
@@ -260,8 +259,8 @@ class _SignUpScreenState extends State<SingUpDoctorPage> {
                 height: 20,
               ),
               ContainerUnder(
-                text: "Vous avez déja un compte ?",
-                textType: "Se connecter",
+                text: 'alreadyHaveAccount'.tr,
+                textType: 'signIn'.tr,
                 onPressed: () {
                   Get.offNamed(Routes.loginScreen);
                 },

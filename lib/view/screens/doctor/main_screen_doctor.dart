@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:tabibi/languages/language_controller.dart';
 import 'package:tabibi/logic/controllers/auth_controller.dart';
-import 'package:tabibi/routes/routes.dart';
+import 'package:tabibi/services/message.dart';
 import 'package:tabibi/services/users.dart';
 import 'package:tabibi/utils/theme.dart';
+import 'package:tabibi/view/detail_user.dart';
 import 'package:tabibi/view/screens/auth/login_screen.dart';
-import 'package:tabibi/view/screens/config/searchBar.dart';
+import 'package:tabibi/view/screens/patient/searchBar.dart';
 import 'package:tabibi/view/screens/config/topBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// ignore: unnecessary_import
+import 'package:tabibi/view/screens/profile.dart';
 
 class MainScreenDoctor extends StatelessWidget {
   const MainScreenDoctor({Key? key}) : super(key: key);
@@ -34,7 +37,7 @@ class _HomePageDoctorState extends State<HomePageDoctor> {
   final pages = [
     const Home(),
     const Patients(),
-    const messages(),
+    const Messages(),
     const Profile(),
   ];
 
@@ -201,7 +204,7 @@ class _HomeState extends State<Home> {
               email: email,
             ),
             const SizedBox(height: 5),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 17),
               child: SizedBox(
                 width: 323,
@@ -209,7 +212,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Trouvez vos patients ici',
+                        'findYourPatient'.tr,
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.black,
@@ -239,9 +242,9 @@ class _HomeState extends State<Home> {
                 width: 323,
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Liste des patients',
+                        'listePatients'.tr,
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.black,
@@ -254,7 +257,7 @@ class _HomeState extends State<Home> {
                         // add see all action here
                       },
                       child: Text(
-                        'Voir tout',
+                        'seeAll'.tr,
                         style: TextStyle(
                           color: mainColor,
                         ),
@@ -308,14 +311,22 @@ class _HomeState extends State<Home> {
                                     children: [
                                       InkWell(
                                         onTap: () {
-                                          Get.toNamed(Routes.addUrgencyPage);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UserDetailsScreen(
+                                                id: patient['id'],
+                                              ),
+                                            ),
+                                          );
                                         },
                                         child: ClipOval(
                                           child: SizedBox(
                                             width: 100,
                                             height: 70,
-                                            child: Image.asset(
-                                              'assets/images/doctor.png',
+                                            child: Image.network(
+                                              patient['avatar'],
                                               height: 70,
                                             ),
                                           ),
@@ -334,8 +345,15 @@ class _HomeState extends State<Home> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                Get.toNamed(
-                                                    Routes.addUrgencyPage);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UserDetailsScreen(
+                                                      id: patient['id'],
+                                                    ),
+                                                  ),
+                                                );
                                               },
                                               child: Text(
                                                 patientName,
@@ -348,8 +366,15 @@ class _HomeState extends State<Home> {
                                             const SizedBox(height: 8),
                                             InkWell(
                                               onTap: () {
-                                                Get.toNamed(
-                                                    Routes.addUrgencyPage);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UserDetailsScreen(
+                                                      id: patient['id'],
+                                                    ),
+                                                  ),
+                                                );
                                               },
                                               child: Text(
                                                 patientUrgance,
@@ -360,15 +385,27 @@ class _HomeState extends State<Home> {
                                               ),
                                             ),
                                             const SizedBox(height: 10),
-                                            ElevatedButton(
-                                              onPressed: () {},
-                                              style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all<
-                                                        Color>(mainColor),
+                                            SizedBox(
+                                              width: 180,
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          UserDetailsScreen(
+                                                        id: patient['id'],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                          Color>(mainColor),
+                                                ),
+                                                child: Text('detailPatient'.tr),
                                               ),
-                                              child: const Text(
-                                                  'Details de patient'),
                                             ),
                                           ],
                                         ),
@@ -393,12 +430,14 @@ class _HomeState extends State<Home> {
 //messages
 
 class Conversation {
+  final int id;
   final String name;
   final String message;
   final String time;
   final String avatarUrl;
 
   Conversation({
+    required this.id,
     required this.name,
     required this.message,
     required this.time,
@@ -407,46 +446,124 @@ class Conversation {
 }
 
 class Message {
+  final int id;
   final String sender;
+  final String senderName; // Add the sender's name property
+  final String receiver;
   final String message;
   final String time;
-  final bool isLiked;
-  final bool unread;
 
   Message({
+    required this.id,
     required this.sender,
+    required this.senderName,
+    required this.receiver,
     required this.message,
     required this.time,
-    required this.isLiked,
-    required this.unread,
   });
+
+  String get formattedTime {
+    final dateTime = DateFormat('yyyy-MM-dd HH:mm:ss').parse(time);
+    final formatter = DateFormat('yy/MM/dd HH:mm');
+    return formatter.format(dateTime);
+  }
 }
 
-class messages extends StatefulWidget {
-  const messages({super.key});
+class Messages extends StatefulWidget {
+  const Messages({Key? key}) : super(key: key);
 
   @override
-  _messagesState createState() => _messagesState();
+  _MessagesState createState() => _MessagesState();
 }
 
-class _messagesState extends State<messages> {
-  final List<Conversation> _conversations = [
-    Conversation(
-      name: 'patient',
-      message: 'Hello, how are you?',
-      time: '12:30 PM',
-      // avatarUrl: 'assets/images/doctor.png',
-      avatarUrl: 'assets/images/doctor.png',
-    ),
-  ];
+class _MessagesState extends State<Messages> {
+  List<dynamic> patients = [];
+  List<Conversation> _conversations = [];
+  int currentUserID = 0; // Replace 0 with the actual current user ID
+
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        currentUserID = prefs.getInt('id') ?? 0;
+      });
+    });
+    fetchPatients().then((fetchedPatients) {
+      if (mounted) {
+        setState(() {
+          patients = fetchedPatients;
+        });
+        fetchLastMessages().then((lastMessages) {
+          if (mounted) {
+            setState(() {
+              _conversations = generateConversations(lastMessages);
+            });
+          }
+        }).catchError((error) {
+          print('Error fetching last messages: $error');
+          if (mounted) {
+            setState(() {
+              _conversations = [];
+            });
+          }
+        });
+      }
+    }).catchError((error) {
+      print('Error fetching patients: $error');
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> fetchLastMessages() async {
+    final List<Future<Map<String, dynamic>>> futures = [];
+    for (var patient in patients) {
+      if (patient['id'] != null) {
+        futures.add(fetchLastMessage(
+            currentUserID.toString(), patient['id'].toString()));
+      }
+    }
+    return await Future.wait(futures);
+  }
+
+  List<Conversation> generateConversations(
+      List<Map<String, dynamic>> lastMessages) {
+    List<Conversation> conversations = [];
+    for (var i = 0; i < patients.length; i++) {
+      final patient = patients[i];
+      final lastMessage = lastMessages[i];
+      final message = lastMessage['message'] != null
+          ? lastMessage['message']
+          : 'noMessage'.tr;
+      final time = lastMessage['created_at'] != null
+          ? formatDateTime(lastMessage['created_at'])
+          : '';
+
+      conversations.add(
+        Conversation(
+          id: patient['id'],
+          name: patient['username'],
+          message: message,
+          time: time,
+          avatarUrl: patient['avatar'],
+        ),
+      );
+    }
+    return conversations;
+  }
+
+  String formatDateTime(String timestamp) {
+    final DateTime dateTime = DateTime.parse(timestamp);
+    final DateFormat formatter = DateFormat.yMd().add_jm();
+    return formatter.format(dateTime);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mainColor,
-        elevation: 1,
-        title: const Text('Messages'),
+        elevation: 0,
+        title: Text('messages'.tr),
+        centerTitle: true,
       ),
       body: ListView.builder(
         itemCount: _conversations.length,
@@ -454,11 +571,18 @@ class _messagesState extends State<messages> {
           final conversation = _conversations[index];
           return ListTile(
             leading: CircleAvatar(
-              backgroundImage: AssetImage(conversation.avatarUrl),
+              backgroundImage: NetworkImage(conversation.avatarUrl),
             ),
             title: Text(conversation.name),
-            subtitle: Text(conversation.message),
-            trailing: Text(conversation.time),
+            subtitle: Text(
+              conversation.message.length > 20
+                  ? '${conversation.message.substring(0, 30)}...'
+                  : conversation.message,
+            ),
+            trailing: Text(
+              conversation.time,
+              style: TextStyle(fontSize: 11),
+            ),
             onTap: () {
               Navigator.push(
                 context,
@@ -479,32 +603,56 @@ class _messagesState extends State<messages> {
 class ConversationScreen extends StatefulWidget {
   final Conversation conversation;
 
-  const ConversationScreen({super.key, required this.conversation});
+  const ConversationScreen({
+    Key? key,
+    required this.conversation,
+  }) : super(key: key);
 
   @override
   _ConversationScreenState createState() => _ConversationScreenState();
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-  final List<Message> _messages = [
-    Message(
-      sender: 'patient',
-      message: 'Hello, how are you?',
-      time: '10:30 AM',
-      isLiked: false,
-      unread: true,
-    ),
-    Message(
-      sender: 'doctor',
-      message: 'Hello, how are you?',
-      time: '10:30 AM',
-      isLiked: false,
-      unread: true,
-    ),
-  ];
+  List<Message> _messages = [];
+  int currentUserID = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        currentUserID = prefs.getInt('id') ?? 0;
+      });
+      fetchMessages(currentUserID, widget.conversation.id)
+          .then((fetchedMessages) {
+        if (mounted) {
+          setState(() {
+            _messages = fetchedMessages
+                .map((message) => Message(
+                      id: message.id,
+                      sender: message.sender,
+                      senderName: message.senderName,
+                      receiver: message.receiver,
+                      message: message.message,
+                      time: message.time,
+                    ))
+                .toList();
+          });
+        }
+      }).catchError((error, stackTrace) {
+        print('Error fetching messages: $error');
+        print('Stack trace: $stackTrace');
+        print('Conversation ID: ${widget.conversation.id}');
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    int conversationId = widget.conversation.id;
+    print("the sender: $currentUserID");
+    print("the receiver: $conversationId");
+
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -528,43 +676,100 @@ class _ConversationScreenState extends State<ConversationScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(10.0),
-              itemCount: _messages.length,
-              itemBuilder: (BuildContext context, int index) {
-                final message = _messages[index];
-                return MessageBubble(
-                  message: message,
-                  isMe: message.sender == 'patient' ? false : true,
-                );
-              },
-            ),
+            child: _messages.isEmpty
+                ? Center(
+                    child: Text('noMessage'.tr),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(10.0),
+                    itemCount: _messages.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final message = _messages[index];
+                      final bool isMe =
+                          message.sender == currentUserID.toString();
+                      return Align(
+                        alignment:
+                            isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: MessageBubble(
+                          message: message,
+                          isMe: isMe,
+                          conversationName: widget.conversation.name,
+                        ),
+                      );
+                    },
+                  ),
           ),
           MessageInput(
-            onSendMessage: (String message) {
+            onMessageSent: (String message) {
+              final currentTime = DateTime.now();
               Message newMessage = Message(
-                sender: 'Me',
+                id: _messages.length + 1,
+                sender: currentUserID.toString(),
                 message: message,
-                time: '${DateTime.now().hour}:${DateTime.now().minute}',
-                isLiked: false,
-                unread: true,
+                receiver: conversationId.toString(),
+                time: currentTime.toString(),
+                senderName: '',
               );
               setState(() {
                 _messages.add(newMessage);
               });
+            },
+            currentUserID: currentUserID.toString(),
+            conversation: widget.conversation,
+            onSendMessage: (String message) {
+              _handleSendMessage(
+                  currentUserID.toString(), conversationId.toString(), message);
             },
           ),
         ],
       ),
     );
   }
+
+  Future<void> _handleSendMessage(
+      String senderId, String receiverId, String message) async {
+    try {
+      await sendMessage(senderId, receiverId, message);
+      print('Message sent successfully');
+      // Fetch the updated message list after sending a new message
+      fetchMessages(currentUserID, widget.conversation.id)
+          .then((fetchedMessages) {
+        if (mounted) {
+          setState(() {
+            _messages = fetchedMessages
+                .map((message) => Message(
+                      id: message.id,
+                      sender: message.sender,
+                      senderName: message.senderName,
+                      receiver: message.receiver,
+                      message: message.message,
+                      time: message.time,
+                    ))
+                .toList();
+          });
+        }
+      }).catchError((error, stackTrace) {
+        print('Error fetching messages: $error');
+        print('Stack trace: $stackTrace');
+        print('Conversation ID: ${widget.conversation.id}');
+      });
+    } catch (error) {
+      print('Failed to send the message. Error: $error');
+    }
+  }
 }
 
 class MessageBubble extends StatelessWidget {
   final Message message;
   final bool isMe;
+  final String conversationName;
 
-  const MessageBubble({super.key, required this.message, required this.isMe});
+  const MessageBubble({
+    Key? key,
+    required this.message,
+    required this.isMe,
+    required this.conversationName,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -574,23 +779,25 @@ class MessageBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: isMe ? Colors.grey[200] : mainColor,
         borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(30.0),
-          topRight: const Radius.circular(30.0),
-          bottomLeft:
+          topLeft:
               isMe ? const Radius.circular(30.0) : const Radius.circular(0),
-          bottomRight:
+          topRight:
               isMe ? const Radius.circular(0) : const Radius.circular(30.0),
+          bottomLeft: const Radius.circular(30.0),
+          bottomRight: const Radius.circular(30.0),
         ),
       ),
       child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            message.sender,
-            style: TextStyle(
-              color: Colors.grey[800],
-              fontSize: 12.0,
+            isMe
+                ? 'Moi'
+                : conversationName, // Display 'Me' for current user, otherwise display the conversation name
+            style: const TextStyle(
+              color: Color.fromARGB(255, 0, 0, 0),
+              fontSize: 14.0,
+              fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 5.0),
@@ -598,14 +805,14 @@ class MessageBubble extends StatelessWidget {
             message.message,
             style: TextStyle(
               color: isMe ? Colors.black : Colors.white,
-              fontSize: 15.0,
+              fontSize: 16.0,
             ),
           ),
           const SizedBox(height: 5.0),
           Text(
-            message.time,
-            style: TextStyle(
-              color: Colors.grey[800],
+            DateFormat('yy/MM/dd HH:mm').format(DateTime.parse(message.time)),
+            style: const TextStyle(
+              color: Color.fromARGB(255, 117, 117, 117),
               fontSize: 12.0,
             ),
           ),
@@ -616,9 +823,16 @@ class MessageBubble extends StatelessWidget {
 }
 
 class MessageInput extends StatefulWidget {
-  final Function(String) onSendMessage;
+  final String currentUserID;
+  final Conversation conversation;
+  final Function(String) onMessageSent; // Callback function
 
-  const MessageInput({super.key, required this.onSendMessage});
+  MessageInput({
+    required this.currentUserID,
+    required this.conversation,
+    required this.onMessageSent,
+    required Null Function(String message) onSendMessage,
+  });
 
   @override
   _MessageInputState createState() => _MessageInputState();
@@ -629,8 +843,24 @@ class _MessageInputState extends State<MessageInput> {
 
   void _sendMessage() {
     if (_textEditingController.text.isNotEmpty) {
-      widget.onSendMessage(_textEditingController.text);
+      final senderId = widget.currentUserID.toString();
+      final receiverId = widget.conversation.id.toString();
+      final message = _textEditingController.text;
+
+      _handleSendMessage(senderId, receiverId, message);
       _textEditingController.clear();
+    }
+  }
+
+  Future<void> _handleSendMessage(
+      String senderId, String receiverId, String message) async {
+    try {
+      await sendMessage(senderId, receiverId, message);
+      print('Message sent successfully');
+      widget.onMessageSent(
+          message); // Pass the message to the conversation screen
+    } catch (error) {
+      print('Failed to send the message. Error: $error');
     }
   }
 
@@ -641,15 +871,16 @@ class _MessageInputState extends State<MessageInput> {
       child: Row(
         children: <Widget>[
           IconButton(
-            icon: const Icon(Icons.mic_rounded),
+            icon: const Icon(Icons.camera_alt),
             onPressed: () {},
             color: mainColor,
           ),
           Expanded(
             child: TextField(
               controller: _textEditingController,
-              decoration: const InputDecoration.collapsed(
-                  hintText: 'Entrez un message...'),
+              decoration: InputDecoration.collapsed(
+                hintText: 'enterMessage'.tr,
+              ),
               onSubmitted: (value) {
                 _sendMessage();
               },
@@ -690,7 +921,6 @@ class _PatientsState extends State<Patients> {
         });
       }
     }).catchError((error) {
-      // Handle error when fetching patients
       print('Error: $error');
     });
   }
@@ -700,9 +930,10 @@ class _PatientsState extends State<Patients> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('All Patients'),
+          title: Text('allPatients'.tr),
           centerTitle: true,
           backgroundColor: mainColor,
+          elevation: 0,
         ),
         body: Stack(
           children: [
@@ -744,6 +975,8 @@ class _PatientsState extends State<Patients> {
                                           patient['username'] ?? 'Unknown';
                                       String patientUrgance =
                                           patient['urgence'] ?? 'Unknown';
+                                      String patientAvatar =
+                                          patient['avatar'] ?? 'Unknown';
                                       return Container(
                                         margin: const EdgeInsets.only(
                                           top: 14,
@@ -771,15 +1004,22 @@ class _PatientsState extends State<Patients> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                Get.toNamed(
-                                                    Routes.addUrgencyPage);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UserDetailsScreen(
+                                                      id: patient['id'],
+                                                    ),
+                                                  ),
+                                                );
                                               },
                                               child: ClipOval(
                                                 child: SizedBox(
                                                   width: 100,
                                                   height: 70,
-                                                  child: Image.asset(
-                                                    'assets/images/doctor.png',
+                                                  child: Image.network(
+                                                    '$patientAvatar',
                                                     height: 70,
                                                   ),
                                                 ),
@@ -798,8 +1038,15 @@ class _PatientsState extends State<Patients> {
                                                 children: [
                                                   InkWell(
                                                     onTap: () {
-                                                      Get.toNamed(Routes
-                                                          .addUrgencyPage);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              UserDetailsScreen(
+                                                            id: patient['id'],
+                                                          ),
+                                                        ),
+                                                      );
                                                     },
                                                     child: Text(
                                                       patientName,
@@ -813,8 +1060,15 @@ class _PatientsState extends State<Patients> {
                                                   const SizedBox(height: 8),
                                                   InkWell(
                                                     onTap: () {
-                                                      Get.toNamed(Routes
-                                                          .addUrgencyPage);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              UserDetailsScreen(
+                                                            id: patient['id'],
+                                                          ),
+                                                        ),
+                                                      );
                                                     },
                                                     child: Text(
                                                       patientUrgance,
@@ -825,16 +1079,29 @@ class _PatientsState extends State<Patients> {
                                                     ),
                                                   ),
                                                   const SizedBox(height: 10),
-                                                  ElevatedButton(
-                                                    onPressed: () {},
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(
-                                                                  mainColor),
+                                                  SizedBox(
+                                                    width: 180,
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                UserDetailsScreen(
+                                                              id: patient['id'],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      style: ButtonStyle(
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    mainColor),
+                                                      ),
+                                                      child: Text(
+                                                          'detailPatient'.tr),
                                                     ),
-                                                    child: const Text(
-                                                        'Details de patient'),
                                                   ),
                                                 ],
                                               ),
@@ -874,18 +1141,8 @@ class _ProfileState extends State<Profile> {
 
   String? name;
   String? email;
-
-  getInfoUser() async {
-    SharedPreferences cache = await SharedPreferences.getInstance();
-    String? cachedemail = cache.getString('email');
-    String? cachedName = cache.getString('name');
-
-    setState(() {
-      name = cachedName;
-      email = cachedemail;
-    });
-  }
-
+  String? avatar;
+  String? speciality;
   @override
   void initState() {
     super.initState();
@@ -895,12 +1152,29 @@ class _ProfileState extends State<Profile> {
     Get.put(_authController);
   }
 
+  getInfoUser() async {
+    SharedPreferences cache = await SharedPreferences.getInstance();
+    String? cachedemail = cache.getString('email');
+    String? cachedName = cache.getString('name');
+    String? cachedAvatar = cache.getString('avatar');
+    String? cachedSpeciality = cache.getString('speciality');
+
+    setState(() {
+      name = cachedName;
+      email = cachedemail;
+      avatar = cachedAvatar;
+      speciality = cachedSpeciality;
+    });
+  }
+
+  final LanguageController languageController = Get.put(LanguageController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mainColor,
-        title: const Text('Profile'),
+        title: Text('settings'.tr),
         centerTitle: true,
         elevation: 0,
       ),
@@ -912,11 +1186,11 @@ class _ProfileState extends State<Profile> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  const Align(
+                  Align(
                     alignment: Alignment.center,
                     child: CircleAvatar(
                       radius: 80,
-                      backgroundImage: AssetImage("assets/images/doctor.png"),
+                      backgroundImage: NetworkImage('$avatar'),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -937,8 +1211,8 @@ class _ProfileState extends State<Profile> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Cardiologist",
+                  Text(
+                    "$speciality",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -956,7 +1230,7 @@ class _ProfileState extends State<Profile> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Home()),
+                      MaterialPageRoute(builder: (context) => ProfileScreen()),
                     );
                   },
                   child: Container(
@@ -974,8 +1248,8 @@ class _ProfileState extends State<Profile> {
                         Icons.person,
                         color: mainColor,
                       ),
-                      title: const Text(
-                        'Edit profile',
+                      title: Text(
+                        'profile'.tr,
                         style: TextStyle(
                           color: Colors.black,
                         ),
@@ -983,13 +1257,70 @@ class _ProfileState extends State<Profile> {
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Home()),
+                GetBuilder<LanguageController>(
+                  init: LanguageController(),
+                  builder: (value) {
+                    return Container(
+                      height: 80,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border(
+                            bottom:
+                                BorderSide(color: Colors.black, width: 0.25)),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.language,
+                                color: mainColor,
+                              ),
+                              SizedBox(width: 35),
+                              Text(
+                                'language'.tr,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          DropdownButton<String>(
+                            value: value.savedLang.value,
+                            icon: Icon(
+                              Icons.arrow_downward,
+                              size: 20,
+                            ),
+                            onChanged: (String? newValue) {
+                              print('Selected language: $newValue');
+                              if (newValue != null) {
+                                value.savedLang.value = newValue;
+                                Get.updateLocale(
+                                    Locale(newValue.toLowerCase()));
+                                value.saveLocale();
+                              }
+                            },
+                            items: <DropdownMenuItem<String>>[
+                              DropdownMenuItem<String>(
+                                value: 'ar',
+                                child: Text('العربية'),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: 'fr',
+                                child: Text('Français'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     );
                   },
+                ),
+                GestureDetector(
+                  onTap: () {},
                   child: Container(
                     decoration: const BoxDecoration(
                       border: Border(
@@ -1000,63 +1331,91 @@ class _ProfileState extends State<Profile> {
                       bottom: 10,
                       top: 10,
                     ),
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.people_alt,
-                        color: mainColor,
-                      ),
-                      title: const Text(
-                        'Mes patients',
-                        style: TextStyle(
-                          color: Colors.black,
+                    child: Column(
+                      children: [
+                        SwitchListTile(
+                          title: Text(
+                            'darkMode'.tr,
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          secondary: Icon(
+                            Icons.dark_mode,
+                            color: mainColor,
+                          ),
+                          value: true,
+                          onChanged: (value) {
+                            setState(() {
+                              // isDarkMode = value;
+                              // Call a function to change the theme mode based on the value
+                              // changeThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+                            });
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Home()),
+                  onTap: () async {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.dangerous,
+                                color: Colors.red,
+                                size: 50,
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'confirmationLogoutTitle'.tr,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                          content: Text(
+                            'confirmationLogoutMessage'.tr,
+                            textAlign: TextAlign.center,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('cancel'.tr,
+                                  style: TextStyle(color: Colors.blueGrey)),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                SharedPreferences cache =
+                                    await SharedPreferences.getInstance();
+                                await cache.clear();
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LoginScreen()),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: Text(
+                                'logout'.tr,
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                   child: Container(
                     decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(color: Colors.black, width: 0.25),
-                      ),
-                    ),
-                    padding: const EdgeInsets.only(
-                      bottom: 10,
-                      top: 10,
-                    ),
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.settings,
-                        color: mainColor,
-                      ),
-                      title: const Text(
-                        'Langue',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
-                    );
-                  },
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.black, width: 0.05),
                       ),
                     ),
                     padding: const EdgeInsets.only(
@@ -1068,8 +1427,8 @@ class _ProfileState extends State<Profile> {
                         Icons.logout,
                         color: mainColor,
                       ),
-                      title: const Text(
-                        'Se déconnecter',
+                      title: Text(
+                        'logout'.tr,
                         style: TextStyle(
                           color: Colors.black,
                         ),

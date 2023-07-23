@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tabibi/services/sub-urgance.dart';
 import 'package:tabibi/utils/theme.dart';
-import 'package:tabibi/view/screens/config/searchBar.dart';
+import 'package:tabibi/view/screens/patient/searchBar.dart';
 import 'package:tabibi/view/screens/patient/sub_urgancy_detail_screen.dart';
 
 class DetailUrgence extends StatefulWidget {
@@ -42,8 +42,8 @@ class _DetailUrgenceState extends State<DetailUrgence> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Details d\'urgence',
+        title: Text(
+          'emergencyDetails'.tr,
           style: TextStyle(
             color: Colors.white,
           ),
@@ -65,10 +65,10 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                 const SizedBox(
                   height: 10,
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    'Trouvez vos sous-types d\'urgence ici',
+                    'findSubEmergencyHere'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -89,10 +89,10 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                 const SizedBox(
                   height: 20,
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    'Sous-types',
+                    'subEmergencyTypes'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -113,10 +113,10 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                         ),
                       )
                     : subUrgances.isEmpty
-                        ? const Padding(
+                        ? Padding(
                             padding: EdgeInsets.symmetric(horizontal: 15),
                             child: Text(
-                              'No sub-urgances available',
+                              'noSubEmergenciesAvailable'.tr,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
@@ -147,7 +147,6 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                                   itemCount: subUrgances.length,
                                   itemBuilder: (context, index) {
                                     final subUrgance = subUrgances[index];
-
                                     return Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -160,6 +159,9 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                                                 builder: (context) =>
                                                     SubEmergencyScreen(
                                                   title: subUrgance['name'],
+                                                  id: subUrgance['id'],
+                                                  urganceId:
+                                                      subUrgance['urgance_id'],
                                                 ),
                                               ),
                                             );
@@ -195,6 +197,8 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                                                             SubEmergencyScreen(
                                                           title: subUrgance[
                                                               'name'],
+                                                          id: subUrgance['id'],
+                                                          urganceId: urganceId,
                                                         ),
                                                       ),
                                                     );
@@ -223,7 +227,7 @@ class _DetailUrgenceState extends State<DetailUrgence> {
                                                   child: Text(
                                                     subUrgance['name'],
                                                     style: const TextStyle(
-                                                      color: Colors.black,
+                                                      color: Colors.white,
                                                       fontSize: 15,
                                                     ),
                                                   ),

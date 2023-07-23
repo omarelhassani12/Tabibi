@@ -24,26 +24,22 @@ class SignUpScreenPatient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? dropdownValue =
-        ModalRoute.of(context)?.settings.arguments as String?;
-    print(dropdownValue);
-    Map<String, dynamic> formData = {};
-          // To store the value of the zero input
-      formData['type'] = dropdownValue;
-          // To store the value of the first input
-      formData['nomPrenom'] = nomPrenomController.text;
+    final formData =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-          // To store the value of the second input
-      formData['email'] = emailController.text;
+    if (formData != null) {
+      print(formData);
+    } else {}
 
-          // To store the value of the third input
-      formData['cni'] = cniController.text;
+    formData!['nomPrenom'] = nomPrenomController.text;
 
-          // To store the value of the fourth input
-      formData['password'] = passwordController.text;
+    formData['email'] = emailController.text;
 
-          // To store the value of the fifth input
-      formData['telephone'] = teleController.text;
+    formData['cni'] = cniController.text;
+
+    formData['password'] = passwordController.text;
+
+    formData['telephone'] = teleController.text;
 
     return SafeArea(
       child: Scaffold(
@@ -52,7 +48,7 @@ class SignUpScreenPatient extends StatelessWidget {
           centerTitle: true,
           elevation: 0,
           title: Text(
-            'Inscrivez-vous',
+            'Inscrivez-vous'.tr,
             style: TextStyle(
               color: mainColor,
             ),
@@ -106,11 +102,10 @@ class SignUpScreenPatient extends StatelessWidget {
                           obscureText: false,
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Entrez un nom complete valide';
+                              return 'enterValidName'.tr;
                             } else if (!RegExp(r'^[a-zA-Z]+$')
                                 .hasMatch(value)) {
-                              // The input contains non-alphabet characters
-                              return 'Entrez des caractères alphabétiques seulement';
+                              return 'enterAlphabeticCharactersOnly'.tr;
                             } else {
                               return null;
                             }
@@ -121,7 +116,7 @@ class SignUpScreenPatient extends StatelessWidget {
                             size: 25,
                           ),
                           suffixIcon: const Text(""),
-                          hintText: 'nom et prenom',
+                          hintText: 'fullName'.tr,
                         ),
                       ),
                       const SizedBox(
@@ -134,7 +129,7 @@ class SignUpScreenPatient extends StatelessWidget {
                           obscureText: false,
                           validator: (value) {
                             if (!RegExp(validationEmail).hasMatch(value)) {
-                              return 'Entrez une adresse email valide';
+                              return 'enterValidEmail'.tr;
                             } else {
                               return null;
                             }
@@ -145,7 +140,7 @@ class SignUpScreenPatient extends StatelessWidget {
                             size: 25,
                           ),
                           suffixIcon: const Text(""),
-                          hintText: 'Email',
+                          hintText: 'emailHint'.tr,
                         ),
                       ),
                       const SizedBox(
@@ -158,11 +153,11 @@ class SignUpScreenPatient extends StatelessWidget {
                           obscureText: false,
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Entrez un numero de catre d\'identite valide valide';
+                              return 'enterValidCNI'.tr;
                             } else if (!RegExp(r'^[a-zA-Z\d]+$')
                                 .hasMatch(value)) {
-                              // The input contains non-alphanumeric characters
-                              return 'Entrez des caractères alphabétiques et numériques seulement';
+                              return 'enterAlphabeticAndNumericCharactersOnly'
+                                  .tr;
                             } else {
                               return null;
                             }
@@ -173,7 +168,7 @@ class SignUpScreenPatient extends StatelessWidget {
                             size: 25,
                           ),
                           suffixIcon: const Text(""),
-                          hintText: 'Carte nationale d\'identité',
+                          hintText: 'nationalIdentityCard'.tr,
                         ),
                       ),
                       const SizedBox(
@@ -189,8 +184,7 @@ class SignUpScreenPatient extends StatelessWidget {
                                   controller.isVisibility ? false : true,
                               validator: (value) {
                                 if (value.toString().length < 6) {
-                                  //if value != validationName
-                                  return 'Le mot de passe doit comporter au moins 6 caractères';
+                                  return 'passwordLength'.tr;
                                 } else {
                                   return null;
                                 }
@@ -216,7 +210,7 @@ class SignUpScreenPatient extends StatelessWidget {
                                         size: 25,
                                       ),
                               ),
-                              hintText: 'Mot de passe',
+                              hintText: 'passwordHint'.tr,
                             );
                           },
                         ),
@@ -237,7 +231,7 @@ class SignUpScreenPatient extends StatelessWidget {
                           ],
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return 'telephone is required';
+                              return 'phoneNumberRequired'.tr;
                             }
                             return null;
                           },
@@ -249,7 +243,7 @@ class SignUpScreenPatient extends StatelessWidget {
                               size: 25,
                               color: mainColor,
                             ),
-                            hintText: "Numéro de téléphone",
+                            hintText: 'phoneNumber'.tr,
                             hintStyle: const TextStyle(
                               color: Colors.black45,
                               fontSize: 16,
@@ -274,15 +268,15 @@ class SignUpScreenPatient extends StatelessWidget {
                             arguments: formData,
                           );
                         },
-                        text: "Suivante",
+                        text: 'next'.tr,
                       ),
                     ],
                   ),
                 ),
               ),
               ContainerUnder(
-                text: "Vous avez déja un compte ?",
-                textType: "Se connecter",
+                text: 'alreadyHaveAccount'.tr,
+                textType: 'signIn'.tr,
                 onPressed: () {
                   Get.offNamed(Routes.loginScreen);
                 },

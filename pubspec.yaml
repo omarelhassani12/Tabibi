@@ -43,13 +43,17 @@ dependencies:
   google_sign_in: ^5.4.4
   http: ^0.13.5
   font_awesome_flutter: ^9.2.0
-  fluttertoast: ^8.2.1
   shared_preferences: ^2.0.8
   flutter_localizations:
     sdk: flutter
   intl: ^0.18.1
-
-
+  jwt_decoder: ^2.0.1
+  image_picker: ^0.8.7+5
+  provider: ^6.0.5
+  permission_handler: ^10.2.0
+  dio: ^5.1.2
+  fluttertoast: ^8.2.2
+  mailer: ^6.0.1
 
   
 dev_dependencies:
@@ -61,8 +65,8 @@ flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/ic_launcher.png"
-  adaptive_icon_background: "#fff"
-  adaptive_icon_foreground: "assets/images/ic_launcher.png"
+  # adaptive_icon_background: "#fff"
+  # adaptive_icon_foreground: "assets/images/ic_launcher.png"
   
 
   # The "flutter_lints" package below contains a set of recommended lints to

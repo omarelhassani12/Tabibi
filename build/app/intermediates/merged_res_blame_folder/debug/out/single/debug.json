@@ -1,54 +1,54 @@
 [
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\drawable-v21_launch_background.xml.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\drawable-v21\\launch_background.xml"
+        "merged": "com.example.tabibi.app-merged_res-27:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.example.tabibi.app-main-21:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\mipmap-xhdpi\\ic_launcher.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable-xxhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.example.tabibi.app-merged_res-16:/drawable-xxxhdpi_ic_launcher_foreground.png.flat",
-        "source": "com.example.tabibi.app-main-10:/drawable-xxxhdpi/ic_launcher_foreground.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.example.tabibi.app-main-21:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.example.tabibi.app-merged_res-16:/drawable-mdpi_ic_launcher_foreground.png.flat",
-        "source": "com.example.tabibi.app-main-10:/drawable-mdpi/ic_launcher_foreground.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable_launch_background.xml.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable/launch_background.xml"
     },
     {
-        "merged": "com.example.tabibi.app-merged_res-16:/drawable-hdpi_ic_launcher_foreground.png.flat",
-        "source": "com.example.tabibi.app-main-10:/drawable-hdpi/ic_launcher_foreground.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable-xhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.example.tabibi.app-merged_res-16:/drawable-xxhdpi_ic_launcher_foreground.png.flat",
-        "source": "com.example.tabibi.app-main-10:/drawable-xxhdpi/ic_launcher_foreground.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable-v21_launch_background.xml.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable-v21/launch_background.xml"
     },
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\mipmap-mdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\mipmap-mdpi\\ic_launcher.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.example.tabibi.app-main-21:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\mipmap-hdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\mipmap-hdpi\\ic_launcher.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.example.tabibi.app-main-21:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\mipmap-xxhdpi\\ic_launcher.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable-mdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\mipmap-xxxhdpi\\ic_launcher.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.example.tabibi.app-main-21:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-merged_res-16:\\drawable_launch_background.xml.flat",
-        "source": "C:\\Users\\dell\\.gradle\\daemon\\7.5\\com.example.tabibi.app-main-10:\\drawable\\launch_background.xml"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable-hdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.example.tabibi.app-merged_res-16:/drawable-xhdpi_ic_launcher_foreground.png.flat",
-        "source": "com.example.tabibi.app-main-10:/drawable-xhdpi/ic_launcher_foreground.png"
+        "merged": "com.example.tabibi.app-merged_res-27:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.example.tabibi.app-main-21:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "com.example.tabibi.app-merged_res-16:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.example.tabibi.app-main-10:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.example.tabibi.app-merged_res-27:/drawable-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.tabibi.app-main-21:/drawable-xxxhdpi/ic_launcher_foreground.png"
     }
 ]

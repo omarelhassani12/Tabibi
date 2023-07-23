@@ -5,12 +5,26 @@ import 'package:tabibi/view/widgets/auth/auth_text_from_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+
 class ForgetPasswordScreen extends StatelessWidget {
   ForgetPasswordScreen({Key? key}) : super(key: key);
 
   final TextEditingController emailController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
+
+  
+  // Future<void> sendPasswordRecoveryEmail(BuildContext context) async {
+  //   if (formKey.currentState!.validate()) {
+  //     final email = emailController.text.trim();
+      
+  //     // Get the password from the database or any other method
+  //     final password = 'retrieved_password';
+
+  //     await sendPasswordRecoveryEmail(email, password);
+
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +35,7 @@ class ForgetPasswordScreen extends StatelessWidget {
           centerTitle: true,
           elevation: 0,
           title: Text(
-            'Forget Password',
+            'forgetPasswordtitle'.tr,
             style: TextStyle(
               color: mainColor,
             ),
@@ -47,8 +61,8 @@ class ForgetPasswordScreen extends StatelessWidget {
                   const SizedBox(
                     height: 50,
                   ),
-                  const Text(
-                    "Si vous voulez récupérer votre compte, veuillez fournir votre identifiant e-mail ci-dessous.. ",
+                  Text(
+                    'recoverAccount'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -72,7 +86,7 @@ class ForgetPasswordScreen extends StatelessWidget {
                     validator: (value) {
                       if (!RegExp(validationEmail).hasMatch(value)) {
                         //if value != validationName
-                        return 'Enter valid email';
+                        return 'enterValidEmail'.tr;
                       } else {
                         return null;
                       }
@@ -85,13 +99,13 @@ class ForgetPasswordScreen extends StatelessWidget {
                             size: 30,
                           ),
                     suffixIcon: const Text(""),
-                    hintText: 'Email',
+                    hintText: 'emailHint'.tr,
                   ),
                   const SizedBox(
                     height: 50,
                   ),
                   AuthButton(
-                    text: "Envoyer",
+                    text: "send".tr,
                     onPressed: () {},
                   ),
                 ],

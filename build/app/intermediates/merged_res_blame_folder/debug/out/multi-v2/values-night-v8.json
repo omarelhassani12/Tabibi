@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.tabibi.app-mergeDebugResources-14:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.example.tabibi.app-mergeDebugResources-25:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\projects\\PFE EST2\\tabibi\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "C:\\projects\\mobile\\PFE EST2\\tabibi b\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
