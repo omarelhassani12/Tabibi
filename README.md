@@ -1,16 +1,10 @@
 # tabibi
 
-A new Flutter project.
+A Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Check out our App Demo Video!
 
-A few resources to get you started if this is your first Flutter project:
+[![App Demo Video](https://img.youtube.com/vi/9ya1XUMEOTs/0.jpg)](https://youtu.be/9ya1XUMEOTs?si=yJJx7BoFc1nZKEaV)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
